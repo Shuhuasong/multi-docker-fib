@@ -1,0 +1,15 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t songs/react-test -f ./client/Dockerfile.dev
+
+script:
+  - docker run -e CI=true songs/react-test npm test
+
+after_success:
+  - docker build -t songs/multi-client ./client
+  - docker build -t songs/multi-nginx ./nginx
+  - docker build -t songs/multi-server ./server
+  - docker build -t songs/multi-workder ./worker
