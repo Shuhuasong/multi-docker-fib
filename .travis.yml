@@ -13,3 +13,23 @@ after_success:
   - docker build -t songs/multi-nginx ./nginx
   - docker build -t songs/multi-server ./server
   - docker build -t songs/multi-workder ./worker
+# Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "DOCKER_ID" --password-stdin
+# Take those images and push them to docker hub
+  - docker push songs/multi-client
+  - docker push songs/multi-nginx
+  - docker push songs/multi-server
+  - docker push songs/multi-workder
+
+
+deploy:
+  provider: elasticbeanstalk
+  region: 'us-east-1'
+  app: 'multi-docker'
+  env: 'MultiDocker-env'
+  bucket_name: 'elasticbeanstalk-us-east-1-923445559289'
+  bucket_path: 'docker-multi'
+  on:
+    branch: main
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
